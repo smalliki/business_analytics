@@ -1,0 +1,149 @@
+---
+title: "BA_assignment1"
+author: "Santhosh reddy Mallikireddy"
+date: "10/10/2019"
+output: html_document
+---
+Q1:
+```{r}
+#1.(a)
+pnorm(700, mean = 494, sd = 100, lower.tail = FALSE) #probabiltiy >700 with mean= 494 and SD=100
+#1.(b)
+p_lower <- pnorm(350, mean = 494, sd = 100, lower.tail = TRUE)
+p_higher <- pnorm(450, mean = 494, sd = 100, lower.tail = TRUE)
+p <- p_higher - p_lower
+print(p)
+```
+
+Q2:
+
+```{r}
+z <- qnorm(0.8665) #to find z value
+M <- 449 - (z * 36) #to find mean
+M
+#verification 
+pnorm(449, mean = 409.04, sd = 36, lower.tail = TRUE)
+```
+
+Q3:
+
+```{r}
+Kent <- c(59, 68, 78, 60)
+Los_Angeles <- c(90, 82, 78, 75) 
+M_K <- mean(Kent)
+M_L <- mean(Los_Angeles)
+correlation <- (sum((Kent - M_K) * (Los_Angeles - M_L))) / (sqrt(sum((Kent - M_K)^2) * (sum((Los_Angeles - M_L)^2)))) #by correlation mathematical formula
+print(correlation)
+#Verification
+cor(Kent , Los_Angeles)
+```
+
+Q4:
+```{r}
+library(readr)
+library(dplyr)
+retail <- read_csv("BA-Fall_19/Business analytics/Online_Retail(2).csv")
+#View(retail)
+g <- prop.table(table(retail$Country)) * 100
+g[g>1]
+```
+
+Q5:creating new variable to dataset
+```{r}
+retail$TransactionValue <- retail$Quantity * retail$UnitPrice 
+View(retail)
+```
+
+Q6:
+```{r}
+f <- tapply(retail$TransactionValue, retail$Country, sum)
+f[f>130000]
+```
+
+Q8:To Plot the histogram of transaction values from Germany
+```{r}
+h <- hist(retail$TransactionValue[retail$Country == "Germany"], 
+          ylim = c(0,10000) , xlim = c(-600,1000), breaks = 20)
+text(h$mids,h$counts, label = h$counts, adj = c(0.5, -0.5))
+```
+
+Q9:Highest no. of transactions and most valuable customer
+```{r}
+cus <- tapply(retail$TransactionValue, retail$CustomerID, length)
+cus[which.max(cus)]
+cus_val <- tapply(retail$TransactionValue, retail$CustomerID, sum)
+cus_val[which.max(cus_val)]
+```
+
+Q10:to find percentage of missing values for each variable
+```{r}
+sum(is.na(retail))
+p <- colMeans(is.na(retail[c(0:8)])) * 100
+p
+```
+
+Q11:What are the number of transactions with missing CustomerID records by countries? 
+```{r}
+fun1<-function(x){
+  k<-sum(is.na(x))
+  return(k)}
+tapply(retail$CustomerID,retail$Country,fun1)
+```
+
+Q13:
+```{r}
+NROW(retail$Quantity[retail$Quantity < 0 & retail$Country == "France"]) / NROW(retail)*100
+
+```
+
+Q14:
+```{r}
+x <- tapply(retail$TransactionValue,retail$StockCode,sum)
+x[which.max(x)]
+```
+
+Q15:
+```{r}
+length(unique(retail$CustomerID))
+```
+
+Q7:
+```{r}
+Temp=strptime(retail$InvoiceDate,format='%m/%d/%Y %H:%M',tz='GMT')
+retail$New_Invoice_Date <- as.Date(Temp)
+retail$New_Invoice_Date[20000]- retail$New_Invoice_Date[10]
+retail$Invoice_Day_Week= weekdays(retail$New_Invoice_Date)
+retail$New_Invoice_Hour = as.numeric(format(Temp, "%H"))
+retail$New_Invoice_Month = as.numeric(format(Temp, "%m"))
+#7(a)
+o <- tapply(retail$TransactionValue,retail$Invoice_Day_Week, sum) / sum(retail$TransactionValue) * 100
+o
+#7(b)
+p <- tapply(retail$TransactionValue,retail$Invoice_Day_Week, NROW) / NROW(retail$TransactionValue) * 100
+p
+#7(c)
+l <- tapply(retail$TransactionValue,retail$New_Invoice_Month, length) / length(retail$TransactionValue) * 100
+l
+#7(d)
+q <- max(retail$TransactionValue[retail$Country == "Australia"])
+retail$New_Invoice_Date[q]
+#7(e)
+library(zoo)
+w <- table(retail$New_Invoice_Hour)
+w
+rollapply(w, 2, sum)
+#at hr19 and hr20 
+```
+
+Q12:
+```{r}
+#u<-retail[,c(1,7,12)]
+#str(u)
+#u$CustomerID <- as.factor(u$CustomerID)
+#u$InvoiceNo <- as.numeric(u$InvoiceNo)
+#diff()
+
+
+```
+
+
